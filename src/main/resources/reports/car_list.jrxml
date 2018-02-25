@@ -1,0 +1,120 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!-- Created with Jaspersoft Studio version 6.5.1.final using JasperReports Library version 6.5.1  -->
+<jasperReport xmlns:xsi="http://www.w3.org/2001/XMLSchema-instance"
+              xmlns="http://jasperreports.sourceforge.net/jasperreports"
+              xsi:schemaLocation="http://jasperreports.sourceforge.net/jasperreports http://jasperreports.sourceforge.net/xsd/jasperreport.xsd"
+              name="Cars" pageWidth="842" pageHeight="595" orientation="Landscape" columnWidth="802" leftMargin="20"
+              rightMargin="20" topMargin="20" bottomMargin="20" uuid="81009a31-11e5-494b-9ef1-14c9122bcc33">
+    <queryString>
+        <![CDATA[]]>
+    </queryString>
+    <field name="id" class="java.lang.Long"/>
+    <field name="brand" class="java.lang.String"/>
+    <field name="model" class="java.lang.String"/>
+    <field name="color" class="java.lang.String"/>
+    <field name="fuel" class="java.lang.String"/>
+    <field name="year" class="java.lang.Integer"/>
+    <background>
+        <band splitType="Stretch"/>
+    </background>
+    <title>
+        <band height="79" splitType="Stretch">
+            <staticText>
+                <reportElement x="350" y="20" width="100" height="30" uuid="994c24ff-ec2b-4ffe-b13e-c6be045791e2"/>
+                <text><![CDATA[CARS LIST REPORT]]></text>
+            </staticText>
+        </band>
+    </title>
+    <columnHeader>
+        <band height="35" splitType="Stretch">
+            <staticText>
+                <reportElement x="0" y="0" width="40" height="30" uuid="a51d6f53-1dee-446c-9280-379a48fe59fc">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="0f7074bb-e6ea-4350-9425-56f9e3a6f312"/>
+                </reportElement>
+                <text><![CDATA[id]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="50" y="1" width="100" height="30" uuid="e6381015-0c93-4f72-a773-c36552a60774">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="5c82bbbb-42cb-4145-96c7-9d48eeb11b04"/>
+                </reportElement>
+                <text><![CDATA[brand]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="170" y="0" width="100" height="30" uuid="1c1e19fe-1858-4370-a2d2-4ad80d341f03">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="c909bed0-2df7-49db-96dc-de22500c0504"/>
+                </reportElement>
+                <text><![CDATA[model]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="320" y="0" width="100" height="30" uuid="b469685d-446a-4ca1-a1e7-6f902c7819ae">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="88448a52-92eb-4062-a591-b6e0af20971f"/>
+                </reportElement>
+                <text><![CDATA[color]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="490" y="0" width="100" height="30" uuid="01280563-cdba-45d0-84a8-e66035e67003">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="14ba9b8c-bfe1-4821-823d-0b1362a9cecf"/>
+                </reportElement>
+                <text><![CDATA[fuel]]></text>
+            </staticText>
+            <staticText>
+                <reportElement x="700" y="0" width="100" height="30" uuid="a5f20289-d9ee-42e6-b6e7-d99397a68fe2">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="19599bff-2539-4d8b-9272-8e605e8a6432"/>
+                </reportElement>
+                <text><![CDATA[year]]></text>
+            </staticText>
+        </band>
+    </columnHeader>
+    <detail>
+        <band height="32" splitType="Stretch">
+            <textField>
+                <reportElement x="0" y="0" width="40" height="30" uuid="50086445-28ca-4584-a555-af137b7cb66d">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="0f7074bb-e6ea-4350-9425-56f9e3a6f312"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{id}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="50" y="0" width="100" height="30" uuid="522d9e56-1c60-49f7-b259-62e6eb3f4551">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="5c82bbbb-42cb-4145-96c7-9d48eeb11b04"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{brand}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="170" y="0" width="100" height="30" uuid="3cd56c4b-9462-4d4f-8bc5-56e89cacb1c3">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="c909bed0-2df7-49db-96dc-de22500c0504"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{model}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="320" y="0" width="100" height="30" uuid="b8d56258-3905-4ec7-9791-8233f24baf12">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="88448a52-92eb-4062-a591-b6e0af20971f"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{color}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="490" y="0" width="100" height="30" uuid="bd98a06a-2f2f-4063-9f4c-8aee5f211600">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="14ba9b8c-bfe1-4821-823d-0b1362a9cecf"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{fuel}]]></textFieldExpression>
+            </textField>
+            <textField>
+                <reportElement x="700" y="0" width="100" height="30" uuid="6079964c-716c-4688-a605-b44b9f43eeaa">
+                    <property name="com.jaspersoft.studio.spreadsheet.connectionID"
+                              value="19599bff-2539-4d8b-9272-8e605e8a6432"/>
+                </reportElement>
+                <textFieldExpression><![CDATA[$F{year}]]></textFieldExpression>
+            </textField>
+        </band>
+    </detail>
+</jasperReport>
