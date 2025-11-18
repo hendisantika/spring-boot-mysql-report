@@ -6,15 +6,13 @@ import jakarta.servlet.http.HttpServletRequest;
 import jakarta.servlet.http.HttpServletResponse;
 import net.sf.jasperreports.engine.JRDataSource;
 import net.sf.jasperreports.engine.JRException;
-import net.sf.jasperreports.engine.JasperCompileManager;
 import net.sf.jasperreports.engine.JasperExportManager;
 import net.sf.jasperreports.engine.JasperFillManager;
 import net.sf.jasperreports.engine.JasperPrint;
 import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
-import net.sf.jasperreports.engine.design.JasperDesign;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
-import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.engine.util.JRLoader;
 import net.sf.jasperreports.export.SimpleExporterInput;
 import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
 import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
@@ -53,22 +51,21 @@ public class PdfController {
 //    private Logger logger = LogManager.getLogManager(PdfController.class);
 
     @Autowired
-    ApplicationContext context;
+    private ApplicationContext context;
 
     @Autowired
-    CarRepository carRepository;
+    private CarRepository carRepository;
 
     //    @GetMapping(path = "pdf/{jrxml}")
     @GetMapping(path = "/pdf")
     @ResponseBody
 //    public void getPdf(@PathVariable String jrxml, HttpServletResponse response) throws Exception {
     public void getPdf(HttpServletResponse response) throws Exception {
-        //Get JRXML template from resources folder
-//        Resource resource = context.getResource("classpath:reports/" + jrxml + ".jrxml");
-        Resource resource = context.getResource("classpath:reports/car_list.jrxml");
-        //Compile to jasperReport
+        //Load pre-compiled jasper report
+        Resource resource = context.getResource("classpath:reports/car_list.jasper");
         InputStream inputStream = resource.getInputStream();
-        JasperReport report = JasperCompileManager.compileReport(inputStream);
+        JasperReport report = (JasperReport) JRLoader.loadObject(inputStream);
+
         //Parameters Set
         Map<String, Object> params = new HashMap<>();
 
@@ -89,10 +86,9 @@ public class PdfController {
     @GetMapping(path = "/excel")
     @ResponseBody
     public void getExcel(HttpServletResponse response) throws Exception {
-        //Get JRXML template from resources folder
-        InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jrxml");
-        JasperDesign design = JRXmlLoader.load(jasperStream);
-        JasperReport report = JasperCompileManager.compileReport(design);
+        //Load pre-compiled jasper report
+        InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jasper");
+        JasperReport report = (JasperReport) JRLoader.loadObject(jasperStream);
 
         Map<String, Object> params = new HashMap<>();
 
@@ -135,10 +131,9 @@ public class PdfController {
             JRDataSource dataSource = new JRBeanCollectionDataSource(cars);
             params.put("datasource", dataSource);
 
-            //get real path for report
-            InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jrxml");
-            JasperDesign design = JRXmlLoader.load(jasperStream);
-            JasperReport report = JasperCompileManager.compileReport(design);
+            //Load pre-compiled jasper report
+            InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jasper");
+            JasperReport report = (JasperReport) JRLoader.loadObject(jasperStream);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, params, dataSource);
 
@@ -175,10 +170,9 @@ public class PdfController {
     @ResponseBody
     private void getDownloadReportXls(HttpServletResponse response) {
         try {
-            //get real path for report
-            InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jrxml");
-            JasperDesign design = JRXmlLoader.load(jasperStream);
-            JasperReport report = JasperCompileManager.compileReport(design);
+            //Load pre-compiled jasper report
+            InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jasper");
+            JasperReport report = (JasperReport) JRLoader.loadObject(jasperStream);
 
             Map<String, Object> params = new HashMap<>();
             List<Car> cars = (List<Car>) carRepository.findAll();
