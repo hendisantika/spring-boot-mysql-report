@@ -2,13 +2,22 @@ package com.hendisantika.springbootmysqlreport.controller;
 
 import com.hendisantika.springbootmysqlreport.domain.Car;
 import com.hendisantika.springbootmysqlreport.repository.CarRepository;
-import net.sf.jasperreports.engine.*;
+import jakarta.servlet.http.HttpServletRequest;
+import jakarta.servlet.http.HttpServletResponse;
+import net.sf.jasperreports.engine.JRDataSource;
+import net.sf.jasperreports.engine.JRException;
+import net.sf.jasperreports.engine.JasperCompileManager;
+import net.sf.jasperreports.engine.JasperExportManager;
+import net.sf.jasperreports.engine.JasperFillManager;
+import net.sf.jasperreports.engine.JasperPrint;
+import net.sf.jasperreports.engine.JasperReport;
 import net.sf.jasperreports.engine.data.JRBeanCollectionDataSource;
 import net.sf.jasperreports.engine.design.JasperDesign;
-import net.sf.jasperreports.engine.export.JRXlsExporter;
-import net.sf.jasperreports.engine.export.JRXlsExporterParameter;
 import net.sf.jasperreports.engine.export.ooxml.JRXlsxExporter;
 import net.sf.jasperreports.engine.xml.JRXmlLoader;
+import net.sf.jasperreports.export.SimpleExporterInput;
+import net.sf.jasperreports.export.SimpleOutputStreamExporterOutput;
+import net.sf.jasperreports.export.SimpleXlsxReportConfiguration;
 import org.springframework.beans.factory.annotation.Autowired;
 import org.springframework.context.ApplicationContext;
 import org.springframework.core.io.Resource;
@@ -18,9 +27,6 @@ import org.springframework.web.bind.annotation.RequestMapping;
 import org.springframework.web.bind.annotation.ResponseBody;
 import org.springframework.web.bind.annotation.RestController;
 
-import javax.servlet.ServletOutputStream;
-import javax.servlet.http.HttpServletRequest;
-import javax.servlet.http.HttpServletResponse;
 import java.io.ByteArrayOutputStream;
 import java.io.IOException;
 import java.io.InputStream;
@@ -84,7 +90,6 @@ public class PdfController {
     @ResponseBody
     public void getExcel(HttpServletResponse response) throws Exception {
         //Get JRXML template from resources folder
-//        Resource resource = context.getResource("classpath:reports/" + jrxml + ".jrxml");
         InputStream jasperStream = this.getClass().getResourceAsStream("/reports/car_list.jrxml");
         JasperDesign design = JRXmlLoader.load(jasperStream);
         JasperReport report = JasperCompileManager.compileReport(design);
@@ -95,37 +100,33 @@ public class PdfController {
 
         //Data source Set
         JRDataSource dataSource = new JRBeanCollectionDataSource(cars);
-
-        Resource resource = context.getResource("classpath:reports/car_list.xlsx");
         params.put("datasource", dataSource);
 
         //Make jasperPrint
         JasperPrint jasperPrint = JasperFillManager.fillReport(report, params, dataSource);
-        response.setContentType("application/x-xlsx");
-        response.setHeader("Content-Disposition", "inline: filename: car_list.xlsx");
-
-        //Compile to jasperReport
-        InputStream inputStream = resource.getInputStream();
-        JasperReport report2 = JasperCompileManager.compileReport(inputStream);
-        //Parameters Set
+        response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+        response.setHeader("Content-Disposition", "inline; filename=car_list.xlsx");
 
         final OutputStream ops = response.getOutputStream();
 
-        //Media Type
-//        response.setContentType(MediaType.APPLICATION_OCTET_STREAM_VALUE);
-        //Export Excel Stream
-        JRXlsExporter xls = new JRXlsExporter();
-        xls.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-        xls.setParameter(JRExporterParameter.OUTPUT_STREAM, ops);
+        //Export Excel Stream using modern API
+        JRXlsxExporter xlsxExporter = new JRXlsxExporter();
+        xlsxExporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+        xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(ops));
+
+        SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+        configuration.setOnePagePerSheet(true);
+        configuration.setDetectCellType(true);
+        configuration.setWhitePageBackground(false);
+        xlsxExporter.setConfiguration(configuration);
+
+        xlsxExporter.exportReport();
     }
 
     @GetMapping(path = "/excel2")
     @ResponseBody
     private void getDownloadReportXlsx(HttpServletRequest request, HttpServletResponse response) {
         try {
-            //uncomment this codes if u are want to use servlet output stream
-            ServletOutputStream servletOutputStream = response.getOutputStream();
-
             Map<String, Object> params = new HashMap<>();
 
             List<Car> cars = (List<Car>) carRepository.findAll();
@@ -144,28 +145,20 @@ public class PdfController {
             JRXlsxExporter xlsxExporter = new JRXlsxExporter();
             ByteArrayOutputStream os = new ByteArrayOutputStream();
 
-            xlsxExporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-            xlsxExporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, "car_list.xls");
+            xlsxExporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+            xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(os));
 
-            //uncomment this codes if u are want to use servlet output stream
-//        xlsxExporter.setParameter(JRExporterParameter.OUTPUT_STREAM, servletOutputStream);
+            SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+            configuration.setOnePagePerSheet(true);
+            configuration.setDetectCellType(true);
+            configuration.setWhitePageBackground(false);
+            configuration.setRemoveEmptySpaceBetweenRows(true);
+            xlsxExporter.setConfiguration(configuration);
 
-            xlsxExporter.setParameter(JRExporterParameter.OUTPUT_STREAM, os);
-//        xlsxExporter.setExporterInput(new SimpleExporterInput(jasperPrint));
-//        xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput("car_list.xlsx"));
-//        xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(os));
-            xlsxExporter.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.TRUE);
-            xlsxExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
-            xlsxExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-            xlsxExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-//        xlsxExporter.exportReport();
-
+            xlsxExporter.exportReport();
 
             response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
-            response.setHeader("Content-Disposition", "attachment; filename=car_list.xls");
-
-            //uncomment this codes if u are want to use servlet output stream
-//        servletOutputStream.write(os.toByteArray());
+            response.setHeader("Content-Disposition", "attachment; filename=car_list.xlsx");
 
             response.getOutputStream().write(os.toByteArray());
             response.getOutputStream().flush();
@@ -195,23 +188,24 @@ public class PdfController {
             params.put("datasource", dataSource);
 
             JasperPrint jasperPrint = JasperFillManager.fillReport(report, params, dataSource);
-            response.setContentType("application/x-xls");
-            response.setHeader("Content-Disposition", "attachment; filename=car_list.xls");
+            response.setContentType("application/vnd.openxmlformats-officedocument.spreadsheetml.sheet");
+            response.setHeader("Content-Disposition", "attachment; filename=car_list.xlsx");
 
             final OutputStream ops = response.getOutputStream();
             ByteArrayOutputStream byteArrayOutputStream = new ByteArrayOutputStream();
 
-            JRXlsExporter xlsExporter = new JRXlsExporter();
-            xlsExporter.setParameter(JRExporterParameter.JASPER_PRINT, jasperPrint);
-//            xlsExporter.setParameter(JRExporterParameter.OUTPUT_STREAM, ops);
-            xlsExporter.setParameter(JRExporterParameter.OUTPUT_STREAM, byteArrayOutputStream);
-//            xlsExporter.setParameter(JRExporterParameter.OUTPUT_FILE_NAME, ops);
-            xlsExporter.setParameter(JRXlsExporterParameter.IS_ONE_PAGE_PER_SHEET, Boolean.TRUE);
-            xlsExporter.setParameter(JRXlsExporterParameter.IS_WHITE_PAGE_BACKGROUND, Boolean.FALSE);
-            xlsExporter.setParameter(JRXlsExporterParameter.IS_REMOVE_EMPTY_SPACE_BETWEEN_ROWS, Boolean.TRUE);
-            xlsExporter.setParameter(JRXlsExporterParameter.IS_DETECT_CELL_TYPE, Boolean.TRUE);
+            JRXlsxExporter xlsxExporter = new JRXlsxExporter();
+            xlsxExporter.setExporterInput(new SimpleExporterInput(jasperPrint));
+            xlsxExporter.setExporterOutput(new SimpleOutputStreamExporterOutput(byteArrayOutputStream));
 
-            xlsExporter.exportReport();
+            SimpleXlsxReportConfiguration configuration = new SimpleXlsxReportConfiguration();
+            configuration.setOnePagePerSheet(true);
+            configuration.setWhitePageBackground(false);
+            configuration.setRemoveEmptySpaceBetweenRows(true);
+            configuration.setDetectCellType(true);
+            xlsxExporter.setConfiguration(configuration);
+
+            xlsxExporter.exportReport();
             ops.write(byteArrayOutputStream.toByteArray());
             ops.flush();
             ops.close();
