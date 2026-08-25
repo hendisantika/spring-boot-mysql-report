@@ -14,7 +14,7 @@ A Spring Boot application that demonstrates generating PDF and Excel reports fro
 
 - **Spring Boot**: 4.1.1
 - **Java**: 25 (Jakarta EE)
-- **JasperReports**: 6.20.6
+- **JasperReports**: 7.0.8 (with the `jasperreports-pdf` extension)
 - **MySQL Connector/J**: 9.7.0
 - **Apache POI**: 5.5.1
 - **Maven**: Build tool
@@ -151,7 +151,9 @@ spring-boot-mysql-report/
 ### JasperReports Optimization
 
 - The `.jasper` file is pre-compiled from `car_list.jrxml` and checked into `src/main/resources/reports/` — controllers load it directly instead of compiling JRXML at runtime
-- Pinned to JasperReports **6.20.6** (with `jasperreports-fonts` 6.20.6 and `com.lowagie:itext` 2.1.7). JasperReports 7.x replaced classic JRXML loading with a new Jackson-based `ReportLoader` that does not accept the standard namespaced `.jrxml` schema (or the previously compiled `.jasper` binary), so upgrading past 6.x breaks report generation at runtime — verify this is fixed upstream before bumping these three dependencies together
+- **JasperReports 7.x migration**: 7.x replaced classic JRXML loading with a Jackson-based `ReportLoader` that only understands a new, unnamespaced element schema (`<element kind="staticText" .../>` instead of `<staticText><reportElement .../></staticText>`, bands unwrapped from their old `<band>` wrapper, `<query>` instead of `<queryString>`, etc.) — the old Jaspersoft-Studio-6.5.1-authored `.jrxml`/`.jasper` no longer load under 7.x. `car_list.jrxml`/`car_list.jasper` were regenerated for the new schema by building the report as a `JasperDesign` via the JasperReports Java API and exporting it with `JasperCompileManager`/`JRXmlWriter` (not hand-edited) — re-run that if the layout ever needs to change and you don't have a JasperReports-7-aware version of Jaspersoft Studio.
+- **PDF export requires the `jasperreports-pdf` dependency** in 7.x — PDF generation was split out of JasperReports core into its own extension module, which pulls in [OpenPDF](https://github.com/LibrePDF/OpenPDF) (a maintained iText 4/5-compatible fork) instead of the old `com.lowagie:itext`. Without `jasperreports-pdf` on the classpath, `/report/pdf` fails at runtime with `Missing JasperReports PDF Extension`.
+- This also drops the `com.lowagie:itext` dependency entirely, resolving an unpatched XXE CVE in that library (GHSA flagged, no fixed version exists in the `com.lowagie` line) as a side effect of the OpenPDF switch.
 - Modernized JasperReports API:
     - Replaced deprecated `JRXlsExporter` with `JRXlsxExporter`
     - Using `SimpleExporterInput` and `SimpleOutputStreamExporterOutput`
