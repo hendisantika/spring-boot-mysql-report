@@ -12,16 +12,16 @@ A Spring Boot application that demonstrates generating PDF and Excel reports fro
 
 ## Technology Stack
 
-- **Spring Boot**: 3.5.7
+- **Spring Boot**: 4.1.1
 - **Java**: 25 (Jakarta EE)
 - **JasperReports**: 6.20.6
-- **MySQL**: 9.4
-- **Apache POI**: 5.5.0
+- **MySQL Connector/J**: 9.7.0
+- **Apache POI**: 5.5.1
 - **Maven**: Build tool
 
 ## Prerequisites
 
-- Java 21+ (tested with Java 25)
+- Java 25 (JDK 25 LTS)
 - MySQL Server 5.7+
 - Maven 3.6+
 
@@ -150,9 +150,8 @@ spring-boot-mysql-report/
 
 ### JasperReports Optimization
 
-- Added Maven plugin to pre-compile JRXML templates at build time
-- Using JasperReports 6.20.6 for better Java 25 compatibility
-- Controller methods now load pre-compiled `.jasper` files instead of runtime compilation
+- The `.jasper` file is pre-compiled from `car_list.jrxml` and checked into `src/main/resources/reports/` — controllers load it directly instead of compiling JRXML at runtime
+- Pinned to JasperReports **6.20.6** (with `jasperreports-fonts` 6.20.6 and `com.lowagie:itext` 2.1.7). JasperReports 7.x replaced classic JRXML loading with a new Jackson-based `ReportLoader` that does not accept the standard namespaced `.jrxml` schema (or the previously compiled `.jasper` binary), so upgrading past 6.x breaks report generation at runtime — verify this is fixed upstream before bumping these three dependencies together
 - Modernized JasperReports API:
     - Replaced deprecated `JRXlsExporter` with `JRXlsxExporter`
     - Using `SimpleExporterInput` and `SimpleOutputStreamExporterOutput`
