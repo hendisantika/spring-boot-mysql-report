@@ -7,6 +7,17 @@ updates:
       time: '05:00'
       timezone: Asia/Jakarta
     open-pull-requests-limit: 10
+    ignore:
+      # JasperReports 7.x replaced classic JRXML loading with a Jackson-based
+      # ReportLoader that rejects our namespaced .jrxml/.jasper files, breaking
+      # report generation at runtime. Keep these pinned to the 6.x line until
+      # that's verified fixed upstream. See README.md "JasperReports Optimization".
+      - dependency-name: "net.sf.jasperreports:jasperreports"
+        versions: [">=7.0.0"]
+      - dependency-name: "net.sf.jasperreports:jasperreports-fonts"
+        versions: [">=7.0.0"]
+      - dependency-name: "com.lowagie:itext"
+        versions: [">=3.0.0"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
