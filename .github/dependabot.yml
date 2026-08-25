@@ -7,6 +7,21 @@ updates:
       time: '05:00'
       timezone: Asia/Jakarta
     open-pull-requests-limit: 10
+    ignore:
+      # The 6.x -> 7.x jump silently broke report generation at runtime (7.x's
+      # loader rejects the old JRXML/.jasper schema) with no test catching it,
+      # since CI never ran a real MySQL instance and no test exercised the
+      # report endpoints. Both are fixed now (see the "check dependabot
+      # doesn't reintroduce the old jrxml issue" fix and
+      # SpringBootMysqlReportApplicationTests's report*Generates tests), but
+      # still require a human/agent look at a future major bump rather than
+      # letting it auto-merge unreviewed.
+      - dependency-name: "net.sf.jasperreports:jasperreports"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "net.sf.jasperreports:jasperreports-fonts"
+        update-types: ["version-update:semver-major"]
+      - dependency-name: "net.sf.jasperreports:jasperreports-pdf"
+        update-types: ["version-update:semver-major"]
   - package-ecosystem: "github-actions"
     directory: "/"
     schedule:
